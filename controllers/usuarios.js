@@ -6,12 +6,36 @@ const { generarJWT } = require('../helpers/jwt');
 
 const getUsuarios = async(req, res) => {
 
-    const usuarios = await Usuario.find({}, 'nombre email role google' );
+    // tenemos que recibir el parametro desde
+    const desde = Number(req.query.desde) || 0; // si no trae el parametro que de un Cero
+    // console.log(desde);
 
+
+    // const usuarios = await Usuario
+    //                         .find({}, 'nombre email role google' )
+    //                         .skip( desde ) // que se salte los registros antes del desde
+    //                         .limit( 5 ); // cuantos registros queremos desde la posicion desde
+    
+    // cuantos registros en la DB?
+    // const total = await Usuario.count();
+
+    //! pero si queremos ejecutar varias pormesas al mismo tiempo para no generar un error
+    // esto es una coleccion de promesas
+    // extraemos usando desdestructuracion [] el resultado de la primera promesa y la segunda
+     const [ usuarios ,total ] = await Promise.all([
+        Usuario
+            .find({}, 'nombre email role google img' )
+            .skip( desde ) // que se salte los registros antes del desde
+            .limit( 5 ), // cuantos registros queremos desde la posicion desde
+        Usuario.countDocuments()
+    ]);
+
+    
     res.json({
         ok: true,
         usuarios,
-        uid: req.uid // agregamos el uid del usuario que hizo la petición
+        uid: req.uid, // agregamos el uid del usuario que hizo la petición
+        total
     });
 }
 
