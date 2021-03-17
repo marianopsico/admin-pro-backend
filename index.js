@@ -20,6 +20,9 @@ app.use( express.json() ); //! tambien usamos un middleware que ya trae
 //Base de datos
 dbConnection();
 
+// Directorio Público
+app.use( express.static('public') );
+
 // Rutas
 
 app.use('/api/usuarios', require('./routes/usuarios'));

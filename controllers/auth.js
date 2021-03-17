@@ -1,8 +1,9 @@
 const { response } = require('express');
-const usuario = require('../models/usuario');
+const Usuario = require('../models/usuario');
 // para encriptar las contraseñas usamos npm i encryptjs
 const bcrypt = require('bcryptjs');
 const { generarJWT } = require('../helpers/jwt');
+const { googleVerify } = require('../helpers/google-verify');
 
 const login = async( req, res) => {
     
@@ -12,7 +13,7 @@ const login = async( req, res) => {
 
         //! podriamos demorar 1 segundo la respueta, apr aun usario no es nada y si alguien esta bordardeando el login lo destruye
         //buscamos el usaurio por el email
-        const usuarioDB = await usuario.findOne( { email }); 
+        const usuarioDB = await Usuario.findOne( { email }); 
 
         // verificamos email
         if (!usuarioDB) {
@@ -51,6 +52,58 @@ const login = async( req, res) => {
 
 }
 
+const googleSignIn = async( req, res = response ) => {
+
+    // recibimos el token
+    const googleToken = req.body.token;
+
+    try {
+
+        const { name, email, picture } = await googleVerify( googleToken );
+
+        // tenemos que verificar si existe el usuario
+        const usuarioDB = await Usuario.findOne({email});
+        let usuario;
+
+        if (!usuarioDB) {
+            // si no existe el usuario
+            usuario = new Usuario({
+                nombre: name,
+                email,
+                password: '@@@', // con esto no se puede logear
+                img: picture,
+                google: true
+            })
+        } else {
+            // existe usuario
+            usuario = usuarioDB;
+            usuario.google = true; // marcamos que es un usuario de Googles
+            // usuario.password = '@@@'; // si no le cambiamos la contraseña 
+            // el usuario tiene los dos metodos de autenticacion, 
+            // si se cambia la contraseña el usuario pierde la conexion normal
+        }
+
+        // Guardar en DB
+        await usuario.save();
+
+        // generar un token
+        // si es nuevo este usuario tiene el uid
+        const token = await generarJWT( usuario.id); // mongoose va a saber que queremos hacer referencia al id
+
+        res.json({
+            ok: true,
+            token // enviamos el token
+        });
+    } catch (error) {
+        res.status(401).json({
+            ok: false,
+            msg: 'Token no es correcto',
+        });
+    }
+
+}
+
 module.exports = {
-    login
+    login,
+    googleSignIn
 };
