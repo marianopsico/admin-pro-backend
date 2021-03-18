@@ -35,7 +35,9 @@ router.post(
 
     router.put( '/:id', 
         [
-            
+            validarJWT,
+            check('nombre', 'El nombre del Hospital es necesario').not().isEmpty(),
+            validarCampos
         ],
         actualizarHospital 
     );

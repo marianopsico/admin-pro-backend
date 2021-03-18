@@ -100,10 +100,26 @@ const googleSignIn = async( req, res = response ) => {
             msg: 'Token no es correcto',
         });
     }
+}
 
+const renewToken = async( req, res = response ) => {
+
+    // tomamos el uid del usuario que viene en la request
+    const uid = req.uid;
+
+    // si llegamos aqui es porque tenemos el uid
+    // generar un token
+    const token = await generarJWT( uid ); // mongoose va a saber que queremos hacer referencia al id
+
+    res.json({
+        ok: true,
+        //! regresamos un nuevo Token, es el que el usuario debe grabar en el localStorage y proveerlo despues en las peticiones
+        token // regresamos el nuevo token
+    })
 }
 
 module.exports = {
     login,
-    googleSignIn
+    googleSignIn,
+    renewToken
 };

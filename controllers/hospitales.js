@@ -44,18 +44,84 @@ const crearHospital = async( req, res = response ) => {
     }
 }
 
-const actualizarHospital = ( req, res = response ) => {
-    res.json({
-        ok: true,
-        msg: 'actualizarHospital'
-    })
+const actualizarHospital = async( req, res = response ) => {
+
+    // necesitamos el id de la ruta
+    const id = req.params.id;
+    // como pasamos por la autorizacion del JWT tenemos el uid
+    const uid = req.uid;
+
+    try {
+
+        // existe un hospital con ese id?
+        const hospital = await Hospital.findById( id );
+
+        if( !hospital ) {
+            return res.starus(404).json({
+                ok: false,
+                msg: 'Hospital no encontrado por id',
+            })
+        } 
+
+        // si existe lo actualizo
+       const cambiosHospital = {
+           ...req.body,
+           usuario: uid
+       }
+
+       const hospitalActualizado = await Hospital.findByIdAndUpdate( id , cambiosHospital, { new: true });
+
+        res.json({
+            ok: true,
+            hospital: hospitalActualizado
+        })
+        
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            ok: false,
+            msg: "Hable con el administrador"
+        })
+    }
+    
 }
 
-const borrarHospital = ( req, res = response ) => {
-    res.json({
-        ok: true,
-        msg: 'borrarHospital'
-    })
+const borrarHospital = async( req, res = response ) => {
+
+     // necesitamos el id de la ruta
+     const id = req.params.id;
+    
+     try {
+ 
+         // existe un hospital con ese id?
+         const hospital = await Hospital.findById( id );
+ 
+         if( !hospital ) {
+             return res.starus(404).json({
+                 ok: false,
+                 msg: 'Hospital no encontrado por id',
+             })
+         }
+         
+        await Hospital.findOneAndDelete(id);  
+ 
+         res.json({
+             ok: true,
+             msg: 'Hospital eliminado',
+         })
+         
+     } catch (error) {
+ 
+         console.log(error);
+ 
+         res.status(500).json({
+             ok: false,
+             msg: "Hable con el administrador"
+         })
+     }
+     
 }
 
 module.exports = {

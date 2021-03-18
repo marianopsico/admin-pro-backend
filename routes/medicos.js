@@ -26,7 +26,7 @@ router.get( '/', validarJWT, getMedicos );
 // implementamos varios middlewares
 router.post( 
     '/', 
-    [
+    [   
         validarJWT,
         check('nombre', 'El nombre del Médico es necesario').not().isEmpty(),
         check('hospital', 'El hospital id debe ser valido').isMongoId(),
@@ -36,7 +36,10 @@ router.post(
 
     router.put( '/:id', 
         [
-            
+            validarJWT,
+            check('nombre', 'El nombre del Médico es necesario').not().isEmpty(),
+            check('hospital', 'El hospital id debe ser valido').isMongoId(),
+            validarCampos
         ],
         actualizarMedico 
     );
