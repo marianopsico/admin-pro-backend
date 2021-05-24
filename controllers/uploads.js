@@ -64,7 +64,7 @@ const fileUpload = ( req, res = response ) => {
                 msg: 'Error al mover el archivo'
             });
         }
-        
+
 
         // Actualizar base de datos
         actualizarImagen(tipo, id, nombreArchivo);

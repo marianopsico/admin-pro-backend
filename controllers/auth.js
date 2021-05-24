@@ -111,10 +111,14 @@ const renewToken = async( req, res = response ) => {
     // generar un token
     const token = await generarJWT( uid ); // mongoose va a saber que queremos hacer referencia al id
 
+    // Obtener el usuario por el UID
+    const usuario = await Usuario.findById( uid );
+
     res.json({
         ok: true,
         //! regresamos un nuevo Token, es el que el usuario debe grabar en el localStorage y proveerlo despues en las peticiones
-        token // regresamos el nuevo token
+        token, // regresamos el nuevo token
+        usuario
     })
 }
 

@@ -91,7 +91,8 @@ const actualizarUsuario = async (req, res = response) => {
 
     try {
 
-        const usuarioDB = await Usuario.findById( uid ); // si esto se encuentra existe un usuario con este id
+        // si esto se encuentra existe un usuario con este id
+        const usuarioDB = await Usuario.findById( uid ); 
         
         if ( !usuarioDB ) {
             return res.status(404).json({
@@ -118,8 +119,15 @@ const actualizarUsuario = async (req, res = response) => {
             } 
          } 
          //! necesitamos poner el email que queremos actualizar
-         campos.email = email;
-
+         if ( !usuarioDB.google ) {
+            campos.email = email; // esto solo deberia ser posible si no es de Google
+         } else if ( usuarioDB.email !== email) {
+             return res.status(400).json({
+                ok: false,
+                msg: 'Usuarios de Google no pueden cambiar su correo'
+            })
+         }
+    
         // puede eliminar lo que No quiero actualizar, estos campos no deben cambiarse
         // delete campos.password;
         // delete campos.google;
