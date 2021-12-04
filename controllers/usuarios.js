@@ -19,9 +19,9 @@ const getUsuarios = async(req, res) => {
     // cuantos registros en la DB?
     // const total = await Usuario.count();
 
-    //! pero si queremos ejecutar varias pormesas al mismo tiempo para no generar un error
-    // esto es una coleccion de promesas
-    // extraemos usando desdestructuracion [] el resultado de la primera promesa y la segunda
+    //! pero si queremos ejecutar varias promesas al mismo tiempo para no generar un error
+    //! esto es una coleccion de promesas
+    //! extraemos usando desestructuracion [] el resultado de la primera promesa y la segunda
      const [ usuarios ,total ] = await Promise.all([
         Usuario
             .find({}, 'nombre email role google img' )

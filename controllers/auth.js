@@ -4,6 +4,7 @@ const Usuario = require('../models/usuario');
 const bcrypt = require('bcryptjs');
 const { generarJWT } = require('../helpers/jwt');
 const { googleVerify } = require('../helpers/google-verify');
+const { getMenuFrontEnd } = require('../helpers/menu-frontend');
 
 const login = async( req, res) => {
     
@@ -39,8 +40,9 @@ const login = async( req, res) => {
 
         res.json({
             ok: true,
-            token
-        })
+            token,
+            menu: getMenuFrontEnd( usuarioDB.role )
+        });
         
     } catch (error) {
         console.log(error);
@@ -92,7 +94,8 @@ const googleSignIn = async( req, res = response ) => {
 
         res.json({
             ok: true,
-            token // enviamos el token
+            token, // enviamos el token
+            menu: getMenuFrontEnd( usuario.role )
         });
     } catch (error) {
         res.status(401).json({
@@ -118,7 +121,8 @@ const renewToken = async( req, res = response ) => {
         ok: true,
         //! regresamos un nuevo Token, es el que el usuario debe grabar en el localStorage y proveerlo despues en las peticiones
         token, // regresamos el nuevo token
-        usuario
+        usuario,
+        menu: getMenuFrontEnd( usuario.role )
     })
 }
 
